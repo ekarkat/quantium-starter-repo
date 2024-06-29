@@ -1,0 +1,13 @@
+body {
+  font-family: sans-serif;
+}
+
+#radio-buttons {
+  display: flex; /* Use flexbox layout */
+  margin-top: 5vh;
+  margin-left: 2%;
+}
+
+#radio-buttons label {
+  margin-right: 10px; /* Optional: Add space between labels */
+}

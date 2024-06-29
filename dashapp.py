@@ -5,7 +5,7 @@
 from dash import Dash, dcc, html
 import plotly.express as px
 import pandas as pd
-
+from dash.dependencies import Input, Output
 
 app = Dash(__name__)
 
@@ -15,35 +15,58 @@ colors = {
     'graph': 'white',
 }
 
-# import the data
+# Load data
 df = pd.read_csv('newdata.csv')
 
-# sum all the sales of a the same day for better datra visualization
-df_summed = df.groupby('date')['sales'].sum().reset_index()
+# Define options and corresponding dataframes
+option_map = {
+    'all': df.groupby('date')['sales'].sum().reset_index(),
+    'north': df[df['region'] == 'north'],
+    'south': df[df['region'] == 'south'],
+    'east': df[df['region'] == 'east'],
+    'west': df[df['region'] == 'west']
+}
 
-fig = px.line(df_summed, x="date", y="sales", title='Sales of Pink Morsel Through Time')
+@app.callback(
+    Output('radio-output', 'children'),
+    [Input('radio-buttons', 'value')]
+)
+def update_output(selected_option):
+    df_selected = option_map[selected_option]
+    fig = px.line(df_selected, x='date', y='sales', title=f'Sales Data for {selected_option.capitalize()} Region')
 
+    graph = dcc.Graph(
+        id='graph',
+        figure=fig
+    )
+
+    return graph
 
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(
-        children='A Dash app to visualise the sales data of Pink Morsel',
+        children='Sales Data Visualization for Pink Morsel',
         style={
             'textAlign': 'center',
             'color': colors['text']
-        }
+        },
     ),
 
-    html.Div(children='', style={
-        'textAlign': 'center',
-        'color': colors['text']
-    }),
+    dcc.RadioItems(
+        id='radio-buttons',
+        options=[
+            {'label': 'All', 'value': 'all'},
+            {'label': 'North', 'value': 'north'},
+            {'label': 'South', 'value': 'south'},
+            {'label': 'East', 'value': 'east'},
+            {'label': 'West', 'value': 'west'},
+        ],
+        className='radio-class',
+        value='all'  # Default selected value
+    ),
 
-    dcc.Graph(
-        id='example-graph',
-        figure=fig
-    )
+    html.Div(id='radio-output'),
 
 ])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run_server(debug=True)
