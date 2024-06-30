@@ -45,6 +45,7 @@ def update_output(selected_option):
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(
         children='Sales Data Visualization for Pink Morsel',
+        id='header',
         style={
             'textAlign': 'center',
             'color': colors['text']
@@ -65,7 +66,6 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     ),
 
     html.Div(id='radio-output'),
-
 ])
 
 if __name__ == '__main__':
